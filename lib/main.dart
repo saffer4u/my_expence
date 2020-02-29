@@ -11,9 +11,24 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Personal Expenses',
       theme: ThemeData(
+        textTheme: ThemeData.light().textTheme.copyWith(
+              title: TextStyle(
+                fontFamily: 'Quicksand',
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
         primarySwatch: Colors.purple,
         accentColor: Colors.amber,
-        fontFamily: 'Quicksand'
+        fontFamily: 'Quicksand',
+        appBarTheme: AppBarTheme(
+          textTheme: ThemeData.light().textTheme.copyWith(
+                title: TextStyle(
+                    fontFamily: 'OpenSans',
+                    fontSize: 20,
+                    fontWeight: FontWeight.normal),
+              ),
+        ),
       ),
       home: MyHomePage(),
     );
@@ -60,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
       context: ctx,
       builder: (_) {
         return GestureDetector(
-          onTap: (){},
+          onTap: () {},
           child: NewTransaction(_addNewTransaction),
           behavior: HitTestBehavior.opaque,
         );
@@ -72,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Personal Expenses',style: TextStyle(fontFamily: 'OpenSans'),),
+        title: Text('Personal Expenses'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),

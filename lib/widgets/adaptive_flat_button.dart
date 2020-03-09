@@ -11,17 +11,19 @@ class AdaptiveFlatButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  //Cupertino button for IOS devices.
+            //If we know text will never change we could write const in front of that widget, in order to improve performance.
                     Platform.isIOS
                         ? CupertinoButton(
-                            child: Text(
+                            child: const Text(
                               'Choose Date',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             onPressed: handler,
+                            
                           )
                         : FlatButton(
                             textColor: Theme.of(context).primaryColor,
-                            child: Text(
+                            child: const Text(
                               'Choose Date',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),

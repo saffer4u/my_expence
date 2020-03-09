@@ -118,18 +118,75 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    //MediaQuery orientation property.
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
+  //Widget builder method for Readable code.
 
-    //For MediaQuery use varry insted of putting it every whare.
-    final mediaquery = MediaQuery.of(context);
+  //Return Single Widget.
+  // Widget _buildLandscapeContent() {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: <Widget>[
+  //       Text(
+  //         'Show chart',
+  //         style: Theme.of(context).textTheme.title,
+  //       ),
+  //       Switch.adaptive(
+  //         activeColor: Theme.of(context).accentColor,
+  //         value: _showChart,
+  //         onChanged: (val) {
+  //           setState(() {
+  //             _showChart = val;
+  //           });
+  //         },
+  //       )
+  //     ],
+  //   );
+  // }
 
-    //Plateform dipendent appbar.
-    final PreferredSizeWidget appBar = Platform.isIOS
-        ? CupertinoNavigationBar(
+
+  //Return List of Widgets
+  List<Widget> _buildLandscapeContent(MediaQueryData mediaquery,AppBar appBar,Widget txListWidget) {
+    return [Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          'Show chart',
+          style: Theme.of(context).textTheme.title,
+        ),
+        Switch.adaptive(
+          activeColor: Theme.of(context).accentColor,
+          value: _showChart,
+          onChanged: (val) {
+            setState(() {
+              _showChart = val;
+            });
+          },
+        )
+      ],
+    ),_showChart
+                  ? Container(
+
+                      //For responsive heignt of container.
+                      height: (mediaquery.size.height -
+                              appBar.preferredSize.height -
+                              mediaquery.padding.top) *
+                          0.7,
+                      child: Chart(_recentTransactions))
+                  : txListWidget];
+  }
+
+  List<Widget> _buildPortraitContent(MediaQueryData mediaquery,AppBar appBar,Widget txListWidget) {
+    return [Container(
+
+        //For responsive heignt of container.
+        height: (mediaquery.size.height -
+                appBar.preferredSize.height -
+                mediaquery.padding.top) *
+            0.3,
+        child: Chart(_recentTransactions)),txListWidget];
+  }
+
+  Widget _iosAppBar(){
+    return CupertinoNavigationBar(
             middle: Text(
               'Personal Expenses',
             ),
@@ -142,8 +199,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-          )
-        : AppBar(
+          );
+  }
+
+  Widget _androidAppBar(){
+    return AppBar(
             title: Text('Personal Expenses'),
             actions: <Widget>[
               IconButton(
@@ -152,6 +212,21 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ],
           );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //MediaQuery orientation property.
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    //For MediaQuery use varry insted of putting it every whare.
+    final mediaquery = MediaQuery.of(context);
+
+    //Plateform dipendent appbar.
+    final PreferredSizeWidget appBar = Platform.isIOS
+        ? _iosAppBar()
+        : _androidAppBar();
 
     final txListWidget = Container(
         height: (mediaquery.size.height -
@@ -161,56 +236,23 @@ class _MyHomePageState extends State<MyHomePage> {
         child: TransactionList(_userTransactions, _deleteTransaction));
 
     final pageBody = SafeArea(
-        child: SingleChildScrollView(
-      child: Column(
-        // mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          //Show Chart row with switch.
-          if (isLandscape)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text('Show chart',style: Theme.of(context).textTheme.title,),
-                Switch.adaptive(
-                  activeColor: Theme.of(context).accentColor,
-                  value: _showChart,
-                  onChanged: (val) {
-                    setState(() {
-                      _showChart = val;
-                    });
-                  },
-                )
-              ],
-            ),
+      child: SingleChildScrollView(
+        child: Column(
+          // mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            //Show Chart row with switch.
+            if (isLandscape)
+            //In order to use list of widget in widget we need Spread Operator (ie : {...}).
+            ..._buildLandscapeContent(mediaquery,appBar,txListWidget),
 
-          if (!isLandscape)
-            Container(
+            if (!isLandscape)
+              ..._buildPortraitContent(mediaquery,appBar,txListWidget),
 
-                //For responsive heignt of container.
-                height: (mediaquery.size.height -
-                        appBar.preferredSize.height -
-                        mediaquery.padding.top) *
-                    0.3,
-                child: Chart(_recentTransactions)),
-
-          if (!isLandscape)
-            txListWidget,
-
-          if (isLandscape)
-            _showChart
-                ? Container(
-
-                    //For responsive heignt of container.
-                    height: (mediaquery.size.height -
-                            appBar.preferredSize.height -
-                            mediaquery.padding.top) *
-                        0.7,
-                    child: Chart(_recentTransactions))
-                : txListWidget,
-        ],
+          ],
+        ),
       ),
-    ),);
+    );
 
     return Platform.isIOS
         ? CupertinoPageScaffold(
